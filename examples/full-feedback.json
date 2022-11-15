@@ -1,0 +1,23 @@
+{
+    "feedback": {
+        "title": "Full Feedback Form",
+        "rate": {
+            "type" : "numbers",
+            "value" : 10
+        },
+        "questions": [
+            {
+                "question": "What's great (if anything)?",
+                "answer": "I like speed."
+            },
+            {
+                "question": "What do you find product useful for?",
+                "answer": "To transfer personal files."
+            },
+            {
+                "question": "What's missing or what's not great?",
+                "answer": "Ability to do multiple file transfer"
+            }
+        ]
+    }
+}
