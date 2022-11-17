@@ -1,4 +1,4 @@
-module winden-feedback
+module feedback-api
 
 go 1.19
 
