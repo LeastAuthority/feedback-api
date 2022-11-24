@@ -16,6 +16,9 @@ import (
 func handlePost(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling a post request to feedback url")
 	fmt.Fprintf(w, "post\n")
+
+	// take req.Body and pass it through a JSON decoder and turn
+	// it into a feedback value.
 }
 
 func main() {
