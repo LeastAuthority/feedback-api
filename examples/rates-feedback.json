@@ -1,0 +1,16 @@
+{
+    "channel": "winden.app",
+    "feedback": {
+        "title": "Short Feedback Form",
+        "rate": {
+            "type" : "stars",
+            "value" : 5
+        },
+        "questions": [
+            {
+                "question": "Help us improve",
+                "answer": "Please add more speed."
+            }
+        ]
+    }
+}
