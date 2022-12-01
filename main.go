@@ -13,7 +13,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func handlePost(w http.ResponseWriter, req *http.Request) {
+type Config struct {
+	smtpHost  string
+	smtpPort  uint
+	to        string
+	from      string
+	subject   string
+}
+
 	log.Printf("handling a post request to feedback url")
 	fmt.Fprintf(w, "post\n")
 
