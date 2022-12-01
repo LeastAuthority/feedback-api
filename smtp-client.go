@@ -8,8 +8,8 @@ import (
 	"github.com/emersion/go-smtp"
 )
 
-func connectAndSendEmail(hostname string, port int, from string, to string, subject string, body string) error {
-	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(port))
+func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, body string) error {
+	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 
 	c, err := smtp.Dial(hostPortStr)
 	if err != nil {
