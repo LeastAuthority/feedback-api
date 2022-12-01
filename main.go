@@ -21,11 +21,19 @@ type Config struct {
 	subject   string
 }
 
+func (c *Config) handlePost(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling a post request to feedback url")
 	fmt.Fprintf(w, "post\n")
 
 	// take req.Body and pass it through a JSON decoder and turn
 	// it into a feedback value.
+	var body []byte
+	_, err := req.Body.Read(body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+	req.Body.Close()
+	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, string(body))
 }
 
 func main() {
