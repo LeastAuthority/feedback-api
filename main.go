@@ -42,7 +42,7 @@ func main() {
 
 	c := Config{
 		to: *toAddressPtr,
-		from: "do-not-reply@winden.app",
+		from: "doNotReply@leastauthority.com",
 		subject: "Winden Feedback",
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
