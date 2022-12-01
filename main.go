@@ -38,13 +38,22 @@ func (c *Config) handlePost(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	toAddressPtr := flag.String("to", "feedback@winden.app", "email address to which feedback is to be sent")
+	smtpRelayHost := flag.String("smtp-server", "smtp.gmail.com", "smtp server that routes the email")
+	smtpRelayPort := flag.Uint("smtp-port", 465, "smtp server port number")
 	flag.Parse()
 
+	c := Config{
+		to: *toAddressPtr,
+		from: "do-not-reply@winden.app",
+		subject: "Winden Feedback",
+		smtpPort: *smtpRelayPort,
+		smtpHost: *smtpRelayHost,
+	}
 	// XXX: parse the email address to make sure it is a valid one.
 	log.Printf("feedback email would be send to the address: %s\n", *toAddressPtr)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/v1/feedback", handlePost).Methods("POST")
+	r.HandleFunc("/v1/feedback", c.handlePost).Methods("POST")
 
 
 	srv := &http.Server{
