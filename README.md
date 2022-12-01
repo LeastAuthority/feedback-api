@@ -13,6 +13,21 @@ Simple HTTPS API backend service, which will get data in JSON format and send it
 1. Allow users of Winden.app to leave extensive feedback
 2. Allow users of Winden.app to rate and leave small feedback after each successful transfer by sender or receiver
 
+## Usage
+
+ - Build the code
+
+ `go build`
+
+ - Start the server with the address to which emails need to be sent
+
+ `./feedback-api -to "foo@bar.org"`
+
+ Server listens on `localhost:8001`.
+
+ - Issue Post request:
+
+ `curl --request POST --header "Content-Type: application/json" --data '{"q1": "a1", "q2": "a2"}' localhost:8001/v1/feedback`
 
 ## Technical aspect
 
