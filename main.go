@@ -21,7 +21,7 @@ type Config struct {
 	subject   string
 }
 
-func (c *Config) handlePost(w http.ResponseWriter, req *http.Request) {
+func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling a post request to feedback url")
 	fmt.Fprintf(w, "post\n")
 
@@ -53,7 +53,7 @@ func main() {
 	log.Printf("feedback email would be send to the address: %s\n", *toAddressPtr)
 
 	r := mux.NewRouter()
-	r.HandleFunc("/v1/feedback", c.handlePost).Methods("POST")
+	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
 
 
 	srv := &http.Server{
