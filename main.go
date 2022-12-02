@@ -25,13 +25,16 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 
 	// take req.Body and pass it through a JSON decoder and turn
 	// it into a feedback value.
-	var body []byte
-	_, err := req.Body.Read(body)
+	var body [100]byte
+	n, err := req.Body.Read(body[:])
+	if n == 0 {
+		log.Printf("request has an empty body\n")
+	}
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 	req.Body.Close()
-	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, string(body))
+	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, string(body[:]))
 }
 
 func main() {

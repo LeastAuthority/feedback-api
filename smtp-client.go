@@ -20,8 +20,9 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 
 	msg := fmt.Sprintf("To: %s\r\n" +
 		"Subject: %s\r\n" +
+		"From: %s\r\n" +
 		"\r\n" +
-		"%s\r\n", to, subject, body)
+		"%s\r\n", to, subject, from, body)
 	email := strings.NewReader(msg)
 	log.Printf("sending email to %s\n", to)
 	err = smtpClient.SendMail(from, []string{to}, email)
