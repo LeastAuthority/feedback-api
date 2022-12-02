@@ -13,10 +13,10 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 
 	smtpClient, err := smtp.Dial(hostPortStr)
+	defer smtpClient.Close()
 	if err != nil {
 		log.Printf("%v\n", err)
 	}
-	defer smtpClient.Close()
 
 	msg := fmt.Sprintf("To: %s\r\n" +
 		"Subject: %s\r\n" +
