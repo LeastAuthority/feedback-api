@@ -1,9 +1,9 @@
 package main
 
 import (
-	"strconv"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/emersion/go-smtp"
@@ -13,15 +13,15 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 
 	smtpClient, err := smtp.Dial(hostPortStr)
-	defer smtpClient.Close()
 	if err != nil {
 		log.Printf("%v\n", err)
+		return
 	}
 
-	msg := fmt.Sprintf("To: %s\r\n" +
-		"Subject: %s\r\n" +
-		"From: %s\r\n" +
-		"\r\n" +
+	msg := fmt.Sprintf("To: %s\r\n"+
+		"Subject: %s\r\n"+
+		"From: %s\r\n"+
+		"\r\n"+
 		"%s\r\n", to, subject, from, body)
 	email := strings.NewReader(msg)
 	log.Printf("sending email to %s\n", to)
@@ -30,4 +30,6 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 	if err != nil {
 		log.Printf("%v\n", err)
 	}
+	smtpClient.Close()
+
 }
