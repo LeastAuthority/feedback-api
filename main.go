@@ -31,7 +31,9 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		log.Printf("request has an empty body\n")
 	}
 	if err != nil {
+		log.Printf("%d: Bad Request\n", http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	req.Body.Close()
 	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, string(body[:]))
