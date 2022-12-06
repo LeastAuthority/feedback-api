@@ -29,6 +29,14 @@ Simple HTTPS API backend service, which will get data in JSON format and send it
 
  `curl --request POST --header "Content-Type: application/json" --data '{"q1": "a1", "q2": "a2"}' localhost:8001/v1/feedback`
 
+## Docker image build
+
+- Build image
+`ocker build -t feedback . --build-arg var_SMTP_SERVER=localhost --build-arg var_SMTP_PORT=1025 --build-arg var_TO_MAILBOX=no-reply@localhost`
+
+- Run image
+`docker run -p 8001:8001 -t feedback-api`
+
 ## Technical aspect
 
 - Use JSON format [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259.html)

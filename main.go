@@ -6,19 +6,19 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
 
 	"github.com/gorilla/mux"
 )
 
 type Config struct {
-	smtpHost  string
-	smtpPort  uint
-	to        string
-	from      string
-	subject   string
+	smtpHost string
+	smtpPort uint
+	to       string
+	from     string
+	subject  string
 }
 
 func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
@@ -43,9 +43,9 @@ func main() {
 	flag.Parse()
 
 	c := Config{
-		to: *toAddressPtr,
-		from: "doNotReply@leastauthority.com",
-		subject: "Winden Feedback",
+		to:       *toAddressPtr,
+		from:     "doNotReply@localhost",
+		subject:  "Feedback",
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
 	}
@@ -55,9 +55,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
 
-
 	srv := &http.Server{
-		Addr: ":8001",
+		Addr:    ":8001",
 		Handler: r,
 	}
 
