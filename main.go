@@ -21,6 +21,10 @@ type Config struct {
 	subject   string
 }
 
+const (
+	MaxPayloadSize = 32768
+)
+
 func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 	log.Printf("handling a post request to feedback url")
 
@@ -33,6 +37,17 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	req.Body.Close()
+
+	if len(body) > MaxPayloadSize {
+		// XXX What should be the HTTP error here? For sure
+		// 4xx since this is an error on Client's part. Now,
+		// 400 or 413? Will go with 400 for now, but this is
+		// something to revisit..
+		log.Printf("payload size is larger than 32kB\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, string(body[:]))
 }
 
