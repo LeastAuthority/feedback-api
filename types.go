@@ -1,22 +1,22 @@
 package main
 
-type rating struct {
-	ty string     `json:"type"`
-	value uint    `json:"value"`
+type rate struct {
+	typ string `json:"type"`
+	val string `json:"value"`
 }
 
-type qa struct {
-	question string    `json:"question"`
-	answer string      `json:"answer"`
+type qAndA struct {
+	question string `json:"question"`
+	answer   string `json:"answer"`
+}
+
+type fullFeedback struct {
+	title string          `json:"title"`
+	rate  rate            `json:"rate"`
+	questions []qAndA     `json:"questions"`
 }
 
 type feedback struct {
-	title string    `json:"title"`
-	rate  rating    `json:"rate"`
-	qas   []qa      `json:"questions"`
-}
-
-type FullFeedback struct {
-	channel string    `json:"channel"`
-	fb      feedback  `json:"feedback"`
+	channel  string               `json:"channel"`
+	full     fullFeedback         `json:"feedback"`
 }

@@ -5,11 +5,32 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"encoding/json"
+	"text/template"
+	"bytes"
 
 	"github.com/emersion/go-smtp"
 )
 
-func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, body string) {
+func parseBody(body []byte) (string, error) {
+	var fullFeedback feedback
+	err := json.Unmarshal(body, &fullFeedback)
+	if err != nil {
+		return "", err
+	}
+
+	feedbackTmpl := `
+feedback:
+{{- range $qanda := }}
+`
+	output := bytes.NewBufferString("")
+	tmpl := template.Must(template.New("full feedback template").Parse(feedbackTmpl))
+	tmpl.Execute(output, &fullFeedback.full.questions)
+
+	return output.String(), nil
+}
+
+func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, body []byte) {
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 
 	smtpClient, err := smtp.Dial(hostPortStr)

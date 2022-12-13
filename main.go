@@ -57,7 +57,7 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, string(body[:]))
+	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, body)
 }
 
 func main() {
