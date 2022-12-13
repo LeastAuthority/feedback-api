@@ -5,6 +5,7 @@ package main
 // Address to email to is configurable.
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
@@ -44,6 +45,14 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		// 400 or 413? Will go with 400 for now, but this is
 		// something to revisit..
 		log.Printf("payload size is larger than 32kB\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// check for "syntax" errors but do not decode into Go
+	// values
+	if !json.Valid(body) {
+		log.Printf("malformed JSON payload\n")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
