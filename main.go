@@ -32,7 +32,7 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 	// it into a feedback value.
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		log.Printf("%d: Bad Request\n", http.StatusBadRequest)
+		log.Printf("error reading the request body: %s\n", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
