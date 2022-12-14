@@ -31,6 +31,11 @@ feedback:
 }
 
 func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, body []byte) {
+	emailBody, err := parseBody(body)
+	if err != nil {
+		log.Printf("%v\n", err)
+	}
+
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 
 	smtpClient, err := smtp.Dial(hostPortStr)
@@ -43,7 +48,7 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 		"Subject: %s\r\n"+
 		"From: %s\r\n"+
 		"\r\n"+
-		"%s\r\n", to, subject, from, body)
+		"%s\r\n", to, subject, from, emailBody)
 	email := strings.NewReader(msg)
 	log.Printf("sending email to %s\n", to)
 	err = smtpClient.SendMail(from, []string{to}, email)
