@@ -13,19 +13,23 @@ import (
 )
 
 func parseBody(body []byte) (string, error) {
-	var fullFeedback feedback
+	var fullFeedback Feedback
 	err := json.Unmarshal(body, &fullFeedback)
 	if err != nil {
+		log.Printf("json parsing of the body failed\n")
 		return "", err
 	}
-
 	feedbackTmpl := `
-feedback:
-{{- range $qanda := }}
+{{- range .Questions}}
+Q: {{.Question}}
+A: {{.Answer}}
+{{end}}
 `
 	output := bytes.NewBufferString("")
 	tmpl := template.Must(template.New("full feedback template").Parse(feedbackTmpl))
-	tmpl.Execute(output, &fullFeedback.full.questions)
+	tmpl.Execute(output, &fullFeedback.Full)
+
+	log.Printf("DEBUG: %s\n", output.String())
 
 	return output.String(), nil
 }
