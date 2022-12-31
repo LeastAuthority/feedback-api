@@ -20,6 +20,7 @@ type Config struct {
 	to        string
 	from      string
 	subject   string
+	password  string
 }
 
 const (
@@ -57,13 +58,14 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, body)
+	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, c.password, body)
 }
 
 func main() {
 	toAddressPtr := flag.String("to", "feedback@winden.app", "email address to which feedback is to be sent")
 	smtpRelayHost := flag.String("smtp-server", "smtp.gmail.com", "smtp server that routes the email")
 	smtpRelayPort := flag.Uint("smtp-port", 465, "smtp server port number")
+	smtpPassword := flag.String("smtp-server-password", "", "smtp server password")
 	flag.Parse()
 
 	c := Config{
@@ -72,6 +74,7 @@ func main() {
 		subject: "Winden Feedback",
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
+		password: *smtpPassword,
 	}
 	// XXX: parse the email address to make sure it is a valid one.
 	log.Printf("feedback email would be send to the address: %s\n", *toAddressPtr)

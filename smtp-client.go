@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 	"encoding/json"
 	"text/template"
 	"bytes"
-
-	"github.com/emersion/go-smtp"
+	"net/smtp"
 )
 
 func parseBody(body []byte) (string, error) {
@@ -34,32 +32,29 @@ A: {{.Answer}}
 	return output.String(), nil
 }
 
-func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, body []byte) {
+func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, password string, body []byte) {
 	emailBody, err := parseBody(body)
 	if err != nil {
 		log.Printf("%v\n", err)
 	}
 
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
+	auth := smtp.PlainAuth("", from, password, hostPortStr)
 
-	smtpClient, err := smtp.Dial(hostPortStr)
+	msg :=  "From: " + from + " \n"+
+		"To: " + to + "\n" +
+		"Subject: " + subject + "\n\n" +
+		emailBody + "\r\n"
+
+	log.Printf("sending email to %s\n", to)
+	err = smtp.SendMail(hostPortStr,
+		auth,
+		from, []string{to}, []byte(msg))
+
 	if err != nil {
-		log.Printf("%v\n", err)
+		log.Printf("smtp error: %s", err)
 		return
 	}
 
-	msg := fmt.Sprintf("To: %s\r\n"+
-		"Subject: %s\r\n"+
-		"From: %s\r\n"+
-		"\r\n"+
-		"%s\r\n", to, subject, from, emailBody)
-	email := strings.NewReader(msg)
-	log.Printf("sending email to %s\n", to)
-	err = smtpClient.SendMail(from, []string{to}, email)
-
-	if err != nil {
-		log.Printf("%v\n", err)
-	}
-	smtpClient.Close()
-
+	log.Printf("sent")
 }
