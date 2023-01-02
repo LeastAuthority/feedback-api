@@ -37,6 +37,7 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 	emailBody, err := parseBody(body)
 	if err != nil {
 		log.Printf("%v\n", err)
+		return
 	}
 
 	username := os.Getenv("SMTP_USERNAME")
