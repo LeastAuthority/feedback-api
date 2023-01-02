@@ -19,9 +19,16 @@ Simple HTTPS API backend service, which will get data in JSON format and send it
 
  `go build`
 
+ - Set two environment variables while invoking the `feedback-api` executable, `SMTP_USERNAME` and `SMTP_PASSWORD`.
  - Start the server with the address to which emails need to be sent
 
  `./feedback-api -to "foo@bar.org"`
+
+ or
+
+ `SMTP_USERNAME="foo@foobar.in" SMTP_PASSWORD="barbazquux" ./feedback-api -to foo@barbaz.com -smtp-server smtp.abc.xyz -smtp-port 465`
+
+If you are using `bash`, before typing in the command above, type a `SPC` character, so that the above command carrying the username and password won't get into the bash history.
 
  Server listens on `localhost:8001`.
 
