@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"encoding/json"
 	"text/template"
@@ -38,6 +39,12 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 		log.Printf("%v\n", err)
 	}
 
+	username := os.Getenv("SMTP_USERNAME")
+	password := os.Getenv("SMTP_PASSWORD")
+	if username == "" {
+		log.Printf("WARNING: SMTP_USERNAME not set")
+		return
+	}
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 	auth := smtp.PlainAuth("", from, password, hostPortStr)
 
