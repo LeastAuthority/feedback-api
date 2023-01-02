@@ -9,6 +9,8 @@ import (
 	"text/template"
 	"bytes"
 	"net/smtp"
+	"net/mail"
+	"crypto/tls"
 )
 
 func parseBody(body []byte) (string, error) {
@@ -33,7 +35,7 @@ A: {{.Answer}}
 	return output.String(), nil
 }
 
-func connectAndSendEmail(hostname string, port uint, from string, to string, subject string, password string, body []byte) {
+func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr string, subject string, body []byte) {
 	emailBody, err := parseBody(body)
 	if err != nil {
 		log.Printf("%v\n", err)
@@ -47,22 +49,63 @@ func connectAndSendEmail(hostname string, port uint, from string, to string, sub
 		return
 	}
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
-	auth := smtp.PlainAuth("", from, password, hostPortStr)
+	auth := smtp.PlainAuth("", username, password, hostname)
 
-	msg :=  "From: " + from + " \n"+
-		"To: " + to + "\n" +
-		"Subject: " + subject + "\n\n" +
-		emailBody + "\r\n"
+	tlsconfig := &tls.Config {
+		InsecureSkipVerify: true,
+			ServerName: hostname,
+		}
+	conn, err := tls.Dial("tcp", hostPortStr, tlsconfig)
 
-	log.Printf("sending email to %s\n", to)
-	err = smtp.SendMail(hostPortStr,
-		auth,
-		from, []string{to}, []byte(msg))
-
+	c, err := smtp.NewClient(conn, hostname)
 	if err != nil {
-		log.Printf("smtp error: %s", err)
-		return
+		log.Panic(err)
 	}
+
+	if err = c.Auth(auth); err != nil {
+		log.Panic(err)
+	}
+
+	from := mail.Address{"", fromAddr}
+	to   := mail.Address{"", toAddr}
+
+	headers := make(map[string]string)
+
+	headers["From"] = from.String()
+	headers["To"] = to.String()
+	headers["Subject"] = subject
+
+	message := ""
+	for k,v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + emailBody
+
+	log.Printf("sending email via %s to %s\n", hostPortStr, to)
+	if err = c.Mail(from.Address); err != nil {
+		log.Panic(err)
+	}
+
+	if err = c.Rcpt(to.Address); err != nil {
+		log.Panic(err)
+	}
+
+	w, err := c.Data()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = w.Close()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	c.Quit()
 
 	log.Printf("sent")
 }
