@@ -1,16 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net"
+	"net/mail"
+	"net/smtp"
 	"os"
 	"strconv"
-	"encoding/json"
 	"text/template"
-	"bytes"
-	"net/smtp"
-	"net/mail"
-	"crypto/tls"
 )
 
 func parseBody(body []byte) (string, error) {
@@ -42,6 +43,10 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 		return
 	}
 
+	useTls, err := strconv.ParseBool(os.Getenv("SMTP_USE_TLS"))
+	if err != nil {
+		useTls = true
+	}
 	username := os.Getenv("SMTP_USERNAME")
 	password := os.Getenv("SMTP_PASSWORD")
 	if username == "" {
@@ -51,23 +56,31 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 	auth := smtp.PlainAuth("", username, password, hostname)
 
-	tlsconfig := &tls.Config {
-		InsecureSkipVerify: true,
-			ServerName: hostname,
+	var conn net.Conn
+	if useTls {
+		tlsconfig := &tls.Config{
+			InsecureSkipVerify: true,
+			ServerName:         hostname,
 		}
-	conn, err := tls.Dial("tcp", hostPortStr, tlsconfig)
+		conn, err = tls.Dial("tcp", hostPortStr, tlsconfig)
+	} else {
+		conn, err = net.Dial("tcp", hostPortStr)
+	}
 
 	c, err := smtp.NewClient(conn, hostname)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	if err = c.Auth(auth); err != nil {
-		log.Panic(err)
+	if useTls {
+		err = c.Auth(auth)
+		if err != nil {
+			log.Panic(err)
+		}
 	}
 
 	from := mail.Address{"", fromAddr}
-	to   := mail.Address{"", toAddr}
+	to := mail.Address{"", toAddr}
 
 	headers := make(map[string]string)
 
@@ -76,7 +89,7 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 	headers["Subject"] = subject
 
 	message := ""
-	for k,v := range headers {
+	for k, v := range headers {
 		message += fmt.Sprintf("%s: %s\r\n", k, v)
 	}
 	message += "\r\n" + emailBody
