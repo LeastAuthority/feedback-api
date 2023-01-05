@@ -38,7 +38,7 @@ A server listens on `localhost:8001`.
 ## Docker image build
 
 - Build image
-`docker build -t feedback-api . `
+`docker build -t feedback-api .`
 
 - Run image with default localhost SMTP (note: SMTP server should run inside it)
 `docker run -p 8001:8001 -t feedback-api`
