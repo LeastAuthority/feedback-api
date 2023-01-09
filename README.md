@@ -35,6 +35,10 @@ A server listens on `localhost:8001`.
 
  `curl --request POST --header "Content-Type: application/json" --data '{"q1": "a1", "q2": "a2"}' localhost:8001/v1/feedback`
 
+### Disable TLS
+
+You can disable TLS by setting the environment variable `SMTP_USE_TLS` to `"false"`. This can be useful if you want to use a dummy SMTP server for local development.
+
 ## Docker image build
 
 - Build image
