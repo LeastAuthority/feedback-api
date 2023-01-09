@@ -9,6 +9,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -20,6 +21,7 @@ type Config struct {
 	to       string
 	from     string
 	subject  string
+	httpPort uint
 }
 
 const (
@@ -64,6 +66,7 @@ func main() {
 	toAddressPtr := flag.String("to", "feedback@localhost", "email address to which feedback is to be sent")
 	smtpRelayHost := flag.String("smtp-server", "localhost", "smtp server that routes the email")
 	smtpRelayPort := flag.Uint("smtp-port", 1025, "smtp server port number")
+    httpPort := flag.Uint("http-port", 8001, "HTTP server port number")
 	flag.Parse()
 
 	c := Config{
@@ -72,6 +75,7 @@ func main() {
 		subject:  "Feedback",
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
+		httpPort: *httpPort,
 	}
 	// XXX: parse the email address to make sure it is a valid one.
 	log.Printf("feedback email would be send to the address: %s\n", *toAddressPtr)
@@ -80,7 +84,7 @@ func main() {
 	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
 
 	srv := &http.Server{
-		Addr:    ":8001",
+		Addr:    fmt.Sprintf(":%d", c.httpPort),
 		Handler: r,
 	}
 

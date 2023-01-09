@@ -17,12 +17,13 @@ services:
     hostname: http-server1.local
     container_name: http-server1.local
     ports:
-      - 8001:8001
+      - ${HTTP_PORT:-8001}:${HTTP_PORT:-8001}
     environment:
       - SMTP_SERVER=${SMTP_SERVER:-smtp-server1.local}
       - SMTP_PORT=${SMTP_PORT:-1025}
       - SMTP_USERNAME=${SMTP_USERNAME:-xxx}
       - SMTP_USE_TLS=${SMTP_USE_TLS:-false}
+      - HTTP_PORT=${HTTP_PORT:-8001}
     depends_on:
       - smtp-server1
     deploy: # with --compatibility when needed
