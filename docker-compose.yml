@@ -34,12 +34,17 @@ services:
 
   # Simple SMTP server for dev and CI purpose
   smtp-server1:
-    image: python:3.11.1-alpine3.17
+    # image: python:3.11.1-alpine3.17
+    build:
+      context: docker/smtp-server
+      dockerfile: Dockerfile
     stdin_open: false
     tty: false
     hostname: smtp-server1.local
     container_name: smtp-server1.local
-    command: python3 -m smtpd --class DebuggingServer --nosetuid smtp-server1.local:1025
+    command: python3 -m aiosmtpd --nosetuid --listen smtp-server1.local:1025
+    # The following works too, but is deprectated (https://peps.python.org/pep-0594/#smtpd)
+    # command: python3 -m smtpd --class DebuggingServer --nosetuid smtp-server1.local:1025
 #    network_mode: "bridge"
     ports:
       - 1025:1025
