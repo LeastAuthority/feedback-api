@@ -3,7 +3,7 @@ version: "3.3"
 
 services:
   # Feedback API (from in this repository)
-  feedback-api1:
+  http-server1:
     build:
       context: .
       dockerfile: Dockerfile
@@ -14,16 +14,15 @@ services:
         gid: "${_GID:-1000}"
     stdin_open: false
     tty: false
-    hostname: feedback-api1.local
-    container_name: feedback-api1.local
-#    network_mode: "bridge"
+    hostname: http-server1.local
+    container_name: http-server1.local
     ports:
       - 8001:8001
     environment:
-      - SMTP_SERVER=smtp-server1.local
-      - SMTP_PORT=1025
-      - SMTP_USERNAME=xxx
-      - SMTP_USE_TLS=false
+      - SMTP_SERVER=${SMTP_SERVER:-smtp-server1.local}
+      - SMTP_PORT=${SMTP_PORT:-1025}
+      - SMTP_USERNAME=${SMTP_USERNAME:-xxx}
+      - SMTP_USE_TLS=${SMTP_USE_TLS:-false}
     depends_on:
       - smtp-server1
     deploy: # with --compatibility when needed
@@ -34,7 +33,6 @@ services:
 
   # Simple SMTP server for dev and CI purpose
   smtp-server1:
-    # image: python:3.11.1-alpine3.17
     build:
       context: docker/smtp-server
       dockerfile: Dockerfile
@@ -42,20 +40,16 @@ services:
     tty: false
     hostname: smtp-server1.local
     container_name: smtp-server1.local
-    command: python3 -m aiosmtpd --nosetuid --listen smtp-server1.local:1025
+    command: python3 -m aiosmtpd --nosetuid --listen ${SMTP_SERVER:-smtp-server1.local}:${SMTP_PORT:-1025}
     # The following works too, but is deprectated (https://peps.python.org/pep-0594/#smtpd)
-    # command: python3 -m smtpd --class DebuggingServer --nosetuid smtp-server1.local:1025
-#    network_mode: "bridge"
+    # command: python3 -m smtpd --class DebuggingServer --nosetuid ${SMTP_SERVER:-smtp-server1.local}:${SMTP_PORT:-1025}
     ports:
-      - 1025:1025
+      - ${SMTP_PORT:-1025}:${SMTP_PORT:-1025}
     environment:
       - PYTHONUNBUFFERED=1
+      - TO_MAILBOX=${TO_MAILBOX:-no-reply@localhost}
     deploy: # with --compatibility when needed
       resources:
         limits:
           cpus: '1'
           memory: 256M
-
-# networks:
-#   bridge:
-#     external: true
