@@ -7,19 +7,19 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
 
 	"github.com/gorilla/mux"
 )
 
 type Config struct {
-	smtpHost  string
-	smtpPort  uint
-	to        string
-	from      string
-	subject   string
+	smtpHost string
+	smtpPort uint
+	to       string
+	from     string
+	subject  string
 }
 
 const (
@@ -61,15 +61,15 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	toAddressPtr := flag.String("to", "feedback@winden.app", "email address to which feedback is to be sent")
-	smtpRelayHost := flag.String("smtp-server", "smtp.gmail.com", "smtp server that routes the email")
-	smtpRelayPort := flag.Uint("smtp-port", 465, "smtp server port number")
+	toAddressPtr := flag.String("to", "feedback@localhost", "email address to which feedback is to be sent")
+	smtpRelayHost := flag.String("smtp-server", "localhost", "smtp server that routes the email")
+	smtpRelayPort := flag.Uint("smtp-port", 1025, "smtp server port number")
 	flag.Parse()
 
 	c := Config{
-		to: *toAddressPtr,
-		from: "doNotReply@leastauthority.com",
-		subject: "Winden Feedback",
+		to:       *toAddressPtr,
+		from:     "no-reply@localhost",
+		subject:  "Feedback",
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
 	}
@@ -79,9 +79,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
 
-
 	srv := &http.Server{
-		Addr: ":8001",
+		Addr:    ":8001",
 		Handler: r,
 	}
 
