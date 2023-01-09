@@ -1,0 +1,56 @@
+# Docker compose file to support dev+ops activities
+version: "3.3"
+
+services:
+  # Feedback API (from in this repository)
+  feedback-api1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        user: appuser
+        group: appgroup
+        uid: "${_UID:-1000}"
+        gid: "${_GID:-1000}"
+    stdin_open: false
+    tty: false
+    hostname: feedback-api1.local
+    container_name: feedback-api1.local
+#    network_mode: "bridge"
+    ports:
+      - 8001:8001
+    environment:
+      - SMTP_SERVER=smtp-server1.local
+      - SMTP_PORT=1025
+      - SMTP_USERNAME=xxx
+      - SMTP_USE_TLS=false
+    depends_on:
+      - smtp-server1
+    deploy: # with --compatibility when needed
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+
+  # Simple SMTP server for dev and CI purpose
+  smtp-server1:
+    image: python:3.11.1-alpine3.17
+    stdin_open: false
+    tty: false
+    hostname: smtp-server1.local
+    container_name: smtp-server1.local
+    command: python3 -m smtpd --class DebuggingServer --nosetuid smtp-server1.local:1025
+#    network_mode: "bridge"
+    ports:
+      - 1025:1025
+    environment:
+      - PYTHONUNBUFFERED=1
+    deploy: # with --compatibility when needed
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+
+# networks:
+#   bridge:
+#     external: true
