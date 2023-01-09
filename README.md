@@ -50,12 +50,13 @@ To facilitate integration and testing, Docker Composer support is provided in th
 
 ### Configuration
 
-The relevant environment variables described above can be adapted a local the `.env` file:
+The relevant environment variables described above can be adapted a local `.env` file:
 
 ```
 SMTP_SERVER=smtp-server1.local
 SMTP_PORT=1025
 SMTP_USERNAME=xxx
+SMTP_PASSWORD=xxx
 SMTP_USE_TLS=false
 TO_MAILBOX=no-reply@localhost
 HTTP_PORT=8001

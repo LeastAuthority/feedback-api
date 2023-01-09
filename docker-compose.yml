@@ -22,6 +22,7 @@ services:
       - SMTP_SERVER=${SMTP_SERVER:-smtp-server1.local}
       - SMTP_PORT=${SMTP_PORT:-1025}
       - SMTP_USERNAME=${SMTP_USERNAME:-xxx}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-xxx}
       - SMTP_USE_TLS=${SMTP_USE_TLS:-false}
       - HTTP_PORT=${HTTP_PORT:-8001}
     depends_on:
