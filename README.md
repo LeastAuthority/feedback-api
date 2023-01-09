@@ -33,30 +33,53 @@ A server listens on `localhost:8001`.
 
  - Issue Post request:
 
- `curl --request POST --header "Content-Type: application/json" --data '{"q1": "a1", "q2": "a2"}' localhost:8001/v1/feedback`
+ `curl --request POST --header "Content-Type: application/json" --data '{"feedback":{"questions":[{"question":"q1","answer":"a1"},{"question":"q2","answer":"a2"}]}}' localhost:8001/v1/feedback`
 
 ### Disable TLS
 
 You can disable TLS by setting the environment variable `SMTP_USE_TLS` to `"false"`. This can be useful if you want to use a dummy SMTP server for local development.
 
-## Docker image build
+## Docker
 
-- Build image
-`docker build -t feedback-api .`
+To facilitate integration and testing, Docker Composer support is provided in this repo.
 
-- Run image with default localhost SMTP (note: SMTP server should run inside it)
-`docker run -p 8001:8001 -t feedback-api`
+### Requirements
 
-- Run image with overwritte SMTP config
-`docker run -p 8001:8001 -e SMTP_SERVER=smtp.example.com -e SMTP_PORT=25 -e TO_MAILBOX=feedback@example.com -t feedback-api`
+- Docker (20.10.5+)
+- Docker Composer (1.25.0+)
 
-- Run local SMTP server for development and testing (maildev)[https://github.com/maildev/maildev]
-`docker run -p 1080:1080 -p 1025:1025 maildev/maildev`  
+### Configuration
 
-- Run image and connect to local SMTP server (maildev)[https://github.com/maildev/maildev]
-`docker run -p 8001:8001 -e SMTP_SERVER=<<workstation_ip>> -t feedback-api`  
+The relevant environment variables described above can be adapted a local the `.env` file:
+
+```
+SMTP_SERVER=smtp-server1.local
+SMTP_PORT=1025
+SMTP_USERNAME=xxx
+SMTP_USE_TLS=false
+TO_MAILBOX=no-reply@localhost
+HTTP_PORT=8001
+```
+
+### Usage
+
+It is recommended to explicitly build the images at least once, then subsequently in case of changes on Docker config and/or images:
+
+```
+docker-compose [--compatibility] build
+```
+
+
+The following command should start the required services:
+
+```
+docker-compose [--compatibility] up
+```
+
+REM: Use the `--compatibility` switch (if supported) whenever resources need to be limitted (CPU and MEM).
+
+From this point, the service(s) (http and smtp) should be running and ready to be tested ( see `curl` command above).
 
 ## Technical aspect
 
 - Use JSON format [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259.html)
-
