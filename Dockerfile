@@ -3,7 +3,8 @@ FROM golang:1.19.3-alpine
 COPY . /app
 WORKDIR /app
 
-RUN go build
+RUN go mod download && go mod verify
+RUN go build -buildvcs=false -v
 
 # Default smtp config
 ENV SMTP_SERVER=localhost
