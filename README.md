@@ -81,6 +81,21 @@ REM: Use the `--compatibility` switch (if supported) whenever resources need to 
 
 From this point, the service(s) (http and smtp) should be running and ready to be tested ( see `curl` command above).
 
+### Advanced Usage
+
+If needed, Docker compose can also be used to start a single service. For instance, here is how to run a standalone HTTP server w/o the SMTP service:
+
+```
+docker-compose [--compatibility] run \
+--no-deps \
+--rm \
+--publish 8001:8001 \
+-e SMTP_SERVER=smtp.example.com \
+-e SMTP_PORT=465 \
+-e SMTP_USE_TLS=true \
+http-server1
+```
+
 ## Technical aspect
 
 - Use JSON format [RFC 8259](https://www.rfc-editor.org/rfc/rfc8259.html)
