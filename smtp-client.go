@@ -29,29 +29,32 @@ A: {{.Answer}}
 `
 	output := bytes.NewBufferString("")
 	tmpl := template.Must(template.New("full feedback template").Parse(feedbackTmpl))
-	tmpl.Execute(output, &fullFeedback.Full)
+	err = tmpl.Execute(output, &fullFeedback.Full)
 
-	log.Printf("DEBUG: %s\n", output.String())
+	if err != nil {
+		log.Panic(err)
+		return "", err
+	}
 
 	return output.String(), nil
 }
 
-func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr string, subject string, body []byte) {
+func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr string, subject string, body []byte) error {
 	emailBody, err := parseBody(body)
 	if err != nil {
-		log.Printf("%v\n", err)
-		return
+		return err
 	}
 
 	useTls, err := strconv.ParseBool(os.Getenv("SMTP_USE_TLS"))
 	if err != nil {
 		useTls = true
 	}
+
 	username := os.Getenv("SMTP_USERNAME")
 	password := os.Getenv("SMTP_PASSWORD")
+
 	if username == "" {
 		log.Printf("WARNING: SMTP_USERNAME not set")
-		return
 	}
 	hostPortStr := fmt.Sprintf("%s:%s", hostname, strconv.Itoa(int(port)))
 	auth := smtp.PlainAuth("", username, password, hostname)
@@ -63,8 +66,14 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 			ServerName:         hostname,
 		}
 		conn, err = tls.Dial("tcp", hostPortStr, tlsconfig)
+		if err != nil {
+			return err
+		}
 	} else {
 		conn, err = net.Dial("tcp", hostPortStr)
+		if err != nil {
+			return err
+		}
 	}
 
 	c, err := smtp.NewClient(conn, hostname)
@@ -79,8 +88,8 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 		}
 	}
 
-	from := mail.Address{"", fromAddr}
-	to := mail.Address{"", toAddr}
+	from := mail.Address{Name: "Feedback Server", Address: fromAddr}
+	to := mail.Address{Name: "Feedback Mailbox", Address: toAddr}
 
 	headers := make(map[string]string)
 
@@ -118,7 +127,11 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 		log.Panic(err)
 	}
 
-	c.Quit()
+	err = c.Quit()
+	if err != nil {
+		log.Panic(err)
+	}
 
 	log.Printf("sent")
+	return nil
 }

@@ -7,9 +7,10 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"net/mail"
 
 	"github.com/gorilla/mux"
 )
@@ -31,7 +32,7 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 
 	// take req.Body and pass it through a JSON decoder and turn
 	// it into a feedback value.
-	body, err := ioutil.ReadAll(req.Body)
+	body, err := io.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("error reading the request body: %s\n", err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -40,12 +41,9 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 	req.Body.Close()
 
 	if len(body) > MaxPayloadSize {
-		// XXX What should be the HTTP error here? For sure
-		// 4xx since this is an error on Client's part. Now,
-		// 400 or 413? Will go with 400 for now, but this is
-		// something to revisit..
+		// 413 for too large payload
 		log.Printf("payload size is larger than 32kB\n")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusRequestEntityTooLarge)
 		return
 	}
 
@@ -57,7 +55,23 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	go connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, body)
+	respCh := make(chan error)
+	go func() {
+		err := connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, body)
+
+		if err != nil {
+			log.Printf("Failed sending feedback, error %s\n", err)
+			respCh <- err
+		}
+		respCh <- nil
+	}()
+
+	// in case failed to send, respond with error
+	if err = <-respCh; err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
 func main() {
@@ -73,8 +87,14 @@ func main() {
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
 	}
-	// XXX: parse the email address to make sure it is a valid one.
-	log.Printf("feedback email would be send to the address: %s\n", *toAddressPtr)
+
+	// email address validation
+	_, err := mail.ParseAddress(*toAddressPtr)
+	if err != nil {
+		log.Println("Invalid email address")
+		panic(err)
+	}
+	log.Printf("Feedback email will be sent to: %s\n", *toAddressPtr)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
@@ -84,5 +104,9 @@ func main() {
 		Handler: r,
 	}
 
-	srv.ListenAndServe()
+	err = srv.ListenAndServe()
+
+	if err != nil {
+		panic(err)
+	}
 }
