@@ -48,7 +48,11 @@ func TestFailedServerConnection(t *testing.T) {
 func TestTooLargeDataSent(t *testing.T) {
 
 	payload := make([]byte, 40000)
-	rand.Read(payload)
+
+	_, err := rand.Read(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
@@ -79,7 +83,10 @@ func TestTooLargeDataSent(t *testing.T) {
 
 func TestNonJsonRejection(t *testing.T) {
 	payload := make([]byte, 1024)
-	rand.Read(payload)
+	_, err := rand.Read(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
@@ -173,7 +180,10 @@ func TestSeveralFeedbacksSending(t *testing.T) {
 
 func TestWrongUrlRequest(t *testing.T) {
 	payload := make([]byte, 1024)
-	rand.Read(payload)
+	_, err := rand.Read(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	req, err := http.NewRequest("POST", "/", bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
