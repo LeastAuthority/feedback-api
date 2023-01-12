@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -30,13 +31,18 @@ A: {{.Answer}}
 	output := bytes.NewBufferString("")
 	tmpl := template.Must(template.New("full feedback template").Parse(feedbackTmpl))
 	err = tmpl.Execute(output, &fullFeedback.Full)
-
+	res := output.String()
 	if err != nil {
 		log.Panic(err)
 		return "", err
 	}
 
-	return output.String(), nil
+	if len(res) <= 1 {
+		err := errors.New("json doesn't match template")
+		return "", err
+	}
+
+	return res, nil
 }
 
 func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr string, subject string, body []byte) error {

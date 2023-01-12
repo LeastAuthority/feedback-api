@@ -37,6 +37,11 @@ A: Ability to do multiple file transfer
 			input:       []byte(`{"Questions": [`),
 			expectError: true,
 		},
+		{
+			name:        "json, incorrect template",
+			input:       []byte(`{"Test": []}`),
+			expectError: true,
+		},
 	}
 
 	for _, tc := range testCases {

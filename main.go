@@ -60,7 +60,7 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		err := connectAndSendEmail(c.smtpHost, c.smtpPort, c.from, c.to, c.subject, body)
 
 		if err != nil {
-			log.Printf("Failed sending feedback, error %s\n", err)
+			log.Printf("Failed sending feedback, error: %s\n", err)
 			respCh <- err
 		}
 		respCh <- nil
