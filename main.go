@@ -7,9 +7,9 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"log"
-	"fmt"
 	"net/http"
 	"net/mail"
 
@@ -17,12 +17,13 @@ import (
 )
 
 type Config struct {
-	smtpHost string
-	smtpPort uint
-	to       string
-	from     string
-	subject  string
-	httpPort uint
+	smtpHost    string
+	smtpPort    uint
+	to          string
+	from        string
+	subject     string
+	httpPort    uint
+	insecureTls bool
 }
 
 const (
@@ -80,7 +81,7 @@ func main() {
 	toAddressPtr := flag.String("to", "feedback@localhost", "email address to which feedback is to be sent")
 	smtpRelayHost := flag.String("smtp-server", "localhost", "smtp server that routes the email")
 	smtpRelayPort := flag.Uint("smtp-port", 1025, "smtp server port number")
-    httpPort := flag.Uint("http-port", 8001, "HTTP server port number")
+	httpPort := flag.Uint("http-port", 8001, "HTTP server port number")
 	flag.Parse()
 
 	c := Config{
