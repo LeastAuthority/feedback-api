@@ -17,13 +17,12 @@ import (
 )
 
 type Config struct {
-	smtpHost    string
-	smtpPort    uint
-	to          string
-	from        string
-	subject     string
-	httpPort    uint
-	insecureTls bool
+	smtpHost string
+	smtpPort uint
+	to       string
+	from     string
+	subject  string
+	httpPort uint
 }
 
 const (

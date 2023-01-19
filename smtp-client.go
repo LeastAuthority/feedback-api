@@ -89,13 +89,13 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 
 	c, err := smtp.NewClient(conn, hostname)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	if useTls {
 		err = c.Auth(auth)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 	}
 
@@ -116,31 +116,31 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 
 	log.Printf("sending email via %s to %s\n", hostPortStr, to)
 	if err = c.Mail(from.Address); err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	if err = c.Rcpt(to.Address); err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	w, err := c.Data()
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	_, err = w.Write([]byte(message))
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	err = w.Close()
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	err = c.Quit()
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	log.Printf("sent")
