@@ -2,12 +2,17 @@
 FROM golang:1.19.3-alpine
 
 # Inject the source code
-COPY . /app
-WORKDIR /app
+COPY . /src
 
-# Download dependencies and build the server app
-RUN go mod download && go mod verify
-RUN go build -buildvcs=false -v
+# Download deps, build the app and cleanup the source
+WORKDIR /src
+RUN go mod download && \
+    go mod verify && \
+    go build -o /app/feedback-http-server -buildvcs=false -v && \
+    cd / && rm -vrf /src
+
+# Switch to app directory
+WORKDIR /app
 
 # Default smtp config
 ENV SMTP_SERVER=localhost
@@ -16,7 +21,7 @@ ENV TO_MAILBOX=no-reply@localhost
 ENV HTTP_PORT=8001
 
 # Start the server app by default
-CMD ./feedback-api \
+CMD ./feedback-http-server \
       -smtp-server $SMTP_SERVER \
       -smtp-port $SMTP_PORT \
       -to $TO_MAILBOX \
