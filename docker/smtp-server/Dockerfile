@@ -12,7 +12,7 @@ ARG group=appgroup
 RUN addgroup -g "${gid}" "${group}" && adduser -D -h /home/${user} -s /bin/bash -G "${group}" -u "${uid}" "${user}"
 
 # Prepare directories
-RUN DIRS="/src /app" && \
+RUN DIRS="/app" && \
     mkdir -p ${DIRS} && \
     chown -R ${user}:${group} $DIRS
 
