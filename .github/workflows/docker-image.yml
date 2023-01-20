@@ -31,7 +31,7 @@ jobs:
     - name: Build the Docker image
       id: build
       run: |
-        docker build . --file Dockerfile --tag ${{ feedback-api }}:${{ env.target_tag }} --build-arg VERSION_TAG=${{ env.target_tag }}
+        docker build . --file Dockerfile --tag feedback-api:${{ env.target_tag }} --build-arg VERSION_TAG=${{ env.target_tag }}
 
     - name: List images
       id: list
