@@ -1,6 +1,8 @@
 # Start from the official Go image based on Alpine
 FROM golang:1.19.3-alpine
 
+LABEL Description="HTTP server for feedback API"
+
 # Parameters for default user:group
 ARG uid=1000
 ARG user=appuser
@@ -19,7 +21,7 @@ RUN DIRS="/src /app" && \
 USER ${user}
 
 # Inject the source code
-COPY *.go go.* /src
+COPY *.go go.* /src/
 
 # Download deps, build the app and cleanup the source
 WORKDIR /src
