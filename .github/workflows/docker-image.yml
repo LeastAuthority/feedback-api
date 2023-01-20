@@ -1,5 +1,5 @@
 ---
-name: Publish Feedback API image
+name: Docker Hub
 
 on:
   push:
@@ -43,16 +43,16 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+      #if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
 
     - name: Push to docker hub
       id: push-tag
-      run: echo docker push feedback-api:${{ env.target_tag }}
+      run: docker push feedback-api:${{ env.target_tag }}
       if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
 
     - name: Push to docker hub latest
       id: push-latest
       run: |
         docker tag feedback-api:${{ env.target_tag }} feedback-api:latest
-        echo docker push feedback-api:latest
+        docker push feedback-api:latest
       if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
