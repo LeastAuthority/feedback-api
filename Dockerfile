@@ -2,14 +2,13 @@
 FROM golang:1.19.3-alpine
 
 # Inject the source code
-COPY . /src
+COPY *.go go.* /src
 
 # Download deps, build the app and cleanup the source
 WORKDIR /src
 RUN go mod download && \
     go mod verify && \
-    go build -o /app/feedback-http-server -buildvcs=false -v && \
-    cd / && rm -vrf /src
+    go build -o /app/feedback-http-server -buildvcs=false -v
 
 # Switch to app directory
 WORKDIR /app
