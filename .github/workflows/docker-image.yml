@@ -43,7 +43,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-      #if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+      if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
 
     - name: Push to docker hub
       id: push-tag
