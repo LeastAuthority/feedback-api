@@ -11,6 +11,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix: # In case we need more services later
+        target:
+          - directory: .
+            image: leastauthority/feedback-http-server
     steps:
     - name: Checkout the code
       id: checkout
@@ -31,7 +36,7 @@ jobs:
     - name: Build the Docker image
       id: build
       run: |
-        docker build . --file Dockerfile --tag feedback-api:${{ env.target_tag }} --build-arg VERSION_TAG=${{ env.target_tag }}
+        docker build ./${{ matrix.target.directory }} --file Dockerfile --tag ${{ matrix.target.image }}:${{ env.target_tag }}
 
     - name: List images
       id: list
@@ -47,12 +52,12 @@ jobs:
 
     - name: Push to docker hub
       id: push-tag
-      run: docker push feedback-api:${{ env.target_tag }}
+      run: docker push ${{ matrix.target.image }}:${{ env.target_tag }}
       if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
 
     - name: Push to docker hub latest
       id: push-latest
       run: |
-        docker tag feedback-api:${{ env.target_tag }} feedback-api:latest
-        docker push feedback-api:latest
+        docker tag ${{ matrix.target.image }}:${{ env.target_tag }} ${{ matrix.target.image }}:latest
+        docker push ${{ matrix.target.image }}:latest
       if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
