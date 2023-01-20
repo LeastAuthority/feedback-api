@@ -1,0 +1,80 @@
+---
+name: Docker Hub
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  pre:
+    # Verification to be done before the real check
+    name: Pre-check
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_flag.outputs.should_skip }}
+    steps:
+      - name: Skip flag
+        id: skip_flag
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          concurrent_skipping: 'same_content_newer'
+          paths: '["*.go", "go.*", "Dockerfile", ".github/workflows/docker-image.yml"]'
+
+  main:
+    name: Build and release
+    needs: pre
+    if: needs.pre.outputs.should_skip != 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: # In case we need more services later
+        target:
+          - directory: .
+            image: leastauthority/feedback-http-server
+    steps:
+    - name: Checkout the code
+      id: checkout
+      uses: actions/checkout@v3
+
+    - name: Determine target tag
+      id: target
+      run: |
+        echo "github.ref: ${{ github.ref }}"
+        echo "github.ref_type: ${{ github.ref_type }}"
+        if [ ${{ github.ref_type }} == 'branch' ]; then
+          echo "target_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        else
+          echo "target_tag=$(git describe --tags --always)" >> $GITHUB_ENV
+        fi
+        cat $GITHUB_ENV
+
+    - name: Build the Docker image
+      id: build
+      run: |
+        docker build ./${{ matrix.target.directory }} --file Dockerfile --tag ${{ matrix.target.image }}:${{ env.target_tag }}
+
+    - name: List images
+      id: list
+      run: docker images
+
+    - name: Login to Docker Hub
+      id: login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+
+    - name: Push to docker hub
+      id: push-tag
+      run: docker push ${{ matrix.target.image }}:${{ env.target_tag }}
+      if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+
+    - name: Push to docker hub latest
+      id: push-latest
+      run: |
+        docker tag ${{ matrix.target.image }}:${{ env.target_tag }} ${{ matrix.target.image }}:latest
+        docker push ${{ matrix.target.image }}:latest
+      if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
