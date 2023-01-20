@@ -9,7 +9,24 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  pre:
+    # Verification to be done before the real check
+    name: Pre-check
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_flag.outputs.should_skip }}
+    steps:
+      - name: Skip flag
+        id: skip_flag
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          concurrent_skipping: 'same_content_newer'
+          paths: '["*.go", "go.*", "Dockerfile", ".github/workflows/docker-image.yml"]'
+
+  main:
+    name: Build and release
+    needs: pre
+    if: needs.pre.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix: # In case we need more services later
