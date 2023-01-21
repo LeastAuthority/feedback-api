@@ -10,6 +10,7 @@ on:
 
 jobs:
   check:
+    name: "Go checks"
     runs-on: ubuntu-latest
 
     steps:
@@ -31,14 +32,14 @@ jobs:
         run: "go vet ."
 
   golangci:
-    name: lint
+    name: "Perform static analysis"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.17
       - uses: actions/checkout@v3
-      - name: "Perform static analysis"
+      - name: run lint
         uses: golangci/golangci-lint-action@v3
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
