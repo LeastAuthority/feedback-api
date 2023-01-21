@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -40,7 +41,12 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	req.Body.Close()
+	err = req.Body.Close()
+	if err != nil {
+		log.Printf("error closing the request body: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	if len(body) > MaxPayloadSize {
 		// 413 for too large payload
@@ -106,6 +112,14 @@ func main() {
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", c.httpPort),
 		Handler: r,
+		// the maximum duration for reading the entire request, including the body
+		ReadTimeout: 2 * time.Second,
+		// the maximum duration before timing out writes of the response
+		WriteTimeout: 2 * time.Second,
+		// the maximum amount of time to wait for the next request when keep-alive is enabled
+		IdleTimeout: 30 * time.Second,
+		// the amount of time allowed to read request headers
+		ReadHeaderTimeout: 2 * time.Second,
 	}
 
 	err = srv.ListenAndServe()
