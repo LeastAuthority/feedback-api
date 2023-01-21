@@ -1,6 +1,6 @@
 # Privacy-friendly feedback API
 
-[![Report](https://goreportcard.com/report/github.com/LeastAuthority/feedback-api?style=flat)](https://goreportcard.com/report/github.com/LeastAuthority/feedback-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/LeastAuthority/feedback-api)](https://goreportcard.com/report/github.com/LeastAuthority/feedback-api)
 
 ## Why
 
