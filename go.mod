@@ -1,4 +1,4 @@
-module feedback-api
+module github.com/LeastAuthority/feedback-api
 
 go 1.19
 
