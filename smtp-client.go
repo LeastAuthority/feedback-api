@@ -46,6 +46,7 @@ A: {{.Answer}}
 }
 
 func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr string, subject string, body []byte) error {
+
 	emailBody, err := parseBody(body)
 	if err != nil {
 		return err
@@ -54,6 +55,10 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 	useTls, err := strconv.ParseBool(os.Getenv("SMTP_USE_TLS"))
 	if err != nil {
 		useTls = true
+	}
+	useInsecureTls, err := strconv.ParseBool(os.Getenv("SMTP_USE_INSECURE_TLS"))
+	if err != nil {
+		useInsecureTls = false
 	}
 
 	username := os.Getenv("SMTP_USERNAME")
@@ -66,9 +71,9 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 	auth := smtp.PlainAuth("", username, password, hostname)
 
 	var conn net.Conn
-	if useTls {
+	if useTls || useInsecureTls {
 		tlsconfig := &tls.Config{
-			InsecureSkipVerify: true,
+			InsecureSkipVerify: useInsecureTls,
 			ServerName:         hostname,
 		}
 		conn, err = tls.Dial("tcp", hostPortStr, tlsconfig)
@@ -84,13 +89,13 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 
 	c, err := smtp.NewClient(conn, hostname)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	if useTls {
 		err = c.Auth(auth)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
 	}
 
@@ -111,31 +116,31 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 
 	log.Printf("sending email via %s to %s\n", hostPortStr, to)
 	if err = c.Mail(from.Address); err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	if err = c.Rcpt(to.Address); err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	w, err := c.Data()
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	_, err = w.Write([]byte(message))
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	err = w.Close()
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	err = c.Quit()
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	log.Printf("sent")

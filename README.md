@@ -39,6 +39,10 @@ A server listens on `localhost:8001`.
 
 You can disable TLS by setting the environment variable `SMTP_USE_TLS` to `"false"`. This can be useful if you want to use a dummy SMTP server for local development.
 
+### Allow insecure TLS
+
+You can enable insecure TLS by setting the environment variable `SMTP_USE_INSECURE_TLS` to `"true"`. This can be useful if you want to test with a self-sign certificate server in development env.
+
 ## Docker
 
 To facilitate integration and testing, Docker Composer support is provided in this repo.
