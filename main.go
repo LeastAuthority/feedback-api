@@ -35,7 +35,9 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 
 	// take req.Body and pass it through a JSON decoder and turn
 	// it into a feedback value.
-	body, err := io.ReadAll(req.Body)
+	r := http.MaxBytesReader(w, req.Body, MaxPayloadSize)
+	body, err := io.ReadAll(r)
+
 	if err != nil {
 		log.Printf("error reading the request body: %s\n", err)
 		w.WriteHeader(http.StatusBadRequest)
