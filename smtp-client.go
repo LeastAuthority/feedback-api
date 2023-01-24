@@ -71,6 +71,7 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 	auth := smtp.PlainAuth("", username, password, hostname)
 
 	var conn net.Conn
+	//#nosec G402 -- This is a requirements for CI
 	if useTls || useInsecureTls {
 		tlsconfig := &tls.Config{
 			InsecureSkipVerify: useInsecureTls,

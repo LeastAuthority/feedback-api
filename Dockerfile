@@ -10,7 +10,8 @@ ARG gid=1000
 ARG group=appgroup
 
 # Add user and group for build and runtime
-RUN addgroup -g "${gid}" "${group}" && adduser -D -h /home/${user} -s /bin/bash -G "${group}" -u "${uid}" "${user}"
+RUN id ${user} > /dev/null 2>&1 || \
+    { addgroup -g "${gid}" "${group}" && adduser -D -h /home/${user} -s /bin/bash -G "${group}" -u "${uid}" "${user}"; }
 
 # Prepare directories
 RUN DIRS="/src /app" && \
