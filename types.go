@@ -11,12 +11,12 @@ type QAndA struct {
 }
 
 type FullFeedback struct {
-	Title string          `json:"title"`
-	Rate  Rate            `json:"rate"`
-	Questions []QAndA     `json:"questions"`
+	Title     string  `json:"title"`
+	Rate      Rate    `json:"rate"`
+	Questions []QAndA `json:"questions"`
 }
 
 type Feedback struct {
-	Channel  string               `json:"channel"`
-	Full     FullFeedback         `json:"feedback"`
+	Channel string       `json:"channel"`
+	Full    FullFeedback `json:"feedback"`
 }

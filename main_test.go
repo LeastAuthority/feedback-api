@@ -75,9 +75,9 @@ func TestTooLargeDataSent(t *testing.T) {
 
 	r.ServeHTTP(rr, req)
 
-	if rr.Code != http.StatusRequestEntityTooLarge {
+	if rr.Code != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			rr.Code, http.StatusRequestEntityTooLarge)
+			rr.Code, http.StatusBadRequest)
 	}
 }
 

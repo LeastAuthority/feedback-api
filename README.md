@@ -1,5 +1,7 @@
 # Privacy-friendly feedback API
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/LeastAuthority/feedback-api)](https://goreportcard.com/report/github.com/LeastAuthority/feedback-api)
+
 ## Why
 
 We want to collect feedback from Users in a more privacy-friendly way, without collecting additional data or denying to do for 3rd parties.
