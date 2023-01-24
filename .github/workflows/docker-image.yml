@@ -26,7 +26,7 @@ jobs:
   main:
     name: Build and release
     needs: pre
-    if: needs.pre.outputs.should_skip != 'true'
+    if: github.ref == 'refs/heads/main' || github.ref_type == 'tag' || needs.pre.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix: # In case we need more services later
