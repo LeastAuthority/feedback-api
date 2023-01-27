@@ -24,6 +24,8 @@ func parseBody(body []byte) (string, error) {
 	}
 
 	output := bytes.NewBufferString("")
+
+	//TODO: currently fixed to one template, but should be able to use or itterate via different templates
 	tmpl := template.Must(template.New("full feedback template").Parse(fullFeedbackTemplate))
 	err = tmpl.Execute(output, &fullFeedback)
 	res := output.String()

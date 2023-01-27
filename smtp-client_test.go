@@ -60,6 +60,25 @@ A:
 `,
 		},
 		{
+			name:  "valid only rating",
+			input: []byte(`{"channel":"test.app","feedback":{"title":"Full Feedback Form","rate":{"type":"numbers","value":3},"questions":[{"question":"What's great (if anything)?","answer":""},{"question":"What do you find product useful for?","answer":""},{"question":"What's missing or what's not great?","answer":""}]}}`),
+			expected: `Title: Full Feedback Form
+
+From: test.app
+
+Rate: 3 (numbers)
+
+Q: What's great (if anything)?
+A: 
+
+Q: What do you find product useful for?
+A: 
+
+Q: What's missing or what's not great?
+A: 
+`,
+		},
+		{
 			name:        "invalid json",
 			input:       []byte(`{"Questions": [`),
 			expectError: true,
