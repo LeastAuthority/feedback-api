@@ -18,5 +18,5 @@ type FullFeedback struct {
 
 type Feedback struct {
 	Channel string       `json:"channel"`
-	Full    FullFeedback `json:"feedback"`
+	Content FullFeedback `json:"feedback"`
 }

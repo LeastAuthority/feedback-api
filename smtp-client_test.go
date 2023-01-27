@@ -24,7 +24,12 @@ func TestParseBody(t *testing.T) {
 		{
 			name:  "valid json",
 			input: exampleFull,
-			expected: `
+			expected: `Title: Full Feedback Form
+
+From: test.app
+
+Rate: 10 (numbers)
+
 Q: What's great (if anything)?
 A: I like speed.
 
@@ -32,8 +37,26 @@ Q: What do you find product useful for?
 A: To transfer personal files.
 
 Q: What's missing or what's not great?
-A: Ability to do multiple file transfer
+A: Ability to do multiple file transfer.
+`,
+		},
+		{
+			name:  "valid no rating",
+			input: []byte(`{"channel":"test.app","feedback":{"title":"Full Feedback Form","rate":{"type":"numbers","value":null},"questions":[{"question":"What's great (if anything)?","answer":"Nothing"},{"question":"What do you find product useful for?","answer":""},{"question":"What's missing or what's not great?","answer":""}]}}`),
+			expected: `Title: Full Feedback Form
 
+From: test.app
+
+Rate: not rated
+
+Q: What's great (if anything)?
+A: Nothing
+
+Q: What do you find product useful for?
+A: 
+
+Q: What's missing or what's not great?
+A: 
 `,
 		},
 		{
@@ -61,7 +84,7 @@ A: Ability to do multiple file transfer
 				t.Errorf("unexpected error: %v", err)
 			}
 			if result != tc.expected {
-				t.Errorf("expected: %q \n, but got: %q", tc.expected, result)
+				t.Errorf("expected:\n%q\n, but got:\n%q\n", tc.expected, result)
 			}
 		})
 	}
@@ -77,7 +100,7 @@ func TestConnectAndSendEmailTls(t *testing.T) {
 	fromAddr := "feedback@test.test"
 	toAddr := "no-reply@test.test"
 	subject := "Test Email"
-	body := []byte(`{"feedback": {"questions": [{"question": "What's great (if anything)?","answer": "I like speed."}]}}`)
+	body := payload
 
 	err := connectAndSendEmail(hostname, port, fromAddr, toAddr, subject, body)
 
@@ -111,7 +134,7 @@ func TestConnectAndSendEmailInsecureTls(t *testing.T) {
 	fromAddr := "feedback@test.test"
 	toAddr := "no-reply@test.test"
 	subject := "Test Email"
-	body := []byte(`{"feedback": {"questions": [{"question": "What's great (if anything)?","answer": "I like speed."}]}}`)
+	body := payload
 
 	err := connectAndSendEmail(hostname, port, fromAddr, toAddr, subject, body)
 

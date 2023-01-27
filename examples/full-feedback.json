@@ -1,5 +1,5 @@
 {
-    "channel": "winden.app",
+    "channel": "test.app",
     "feedback": {
         "title": "Full Feedback Form",
         "rate": {
@@ -17,7 +17,7 @@
             },
             {
                 "question": "What's missing or what's not great?",
-                "answer": "Ability to do multiple file transfer"
+                "answer": "Ability to do multiple file transfer."
             }
         ]
     }

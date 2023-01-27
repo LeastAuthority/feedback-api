@@ -1,10 +1,10 @@
 # Email example of rates-feedback.json
 
-**Sender**: no-reply@winden.app
+**Sender**: no-reply@test.app
 
-**Receiver**: feedback@winden.app
+**Receiver**: feedback@test.app
 
-**Subject**: winden.app | Short Feedback Form"
+**Subject**: test.app | Short Feedback Form"
 **Body**: 
 
 11/16/2022 09:00

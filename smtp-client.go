@@ -22,18 +22,14 @@ func parseBody(body []byte) (string, error) {
 		log.Printf("json parsing of the body failed\n")
 		return "", err
 	}
-	feedbackTmpl := `
-{{- range .Questions}}
-Q: {{.Question}}
-A: {{.Answer}}
-{{end}}
-`
+
 	output := bytes.NewBufferString("")
-	tmpl := template.Must(template.New("full feedback template").Parse(feedbackTmpl))
-	err = tmpl.Execute(output, &fullFeedback.Full)
+	tmpl := template.Must(template.New("full feedback template").Parse(fullFeedbackTemplate))
+	err = tmpl.Execute(output, &fullFeedback)
 	res := output.String()
+
 	if err != nil {
-		log.Panic(err)
+		//log.Panic(err)
 		return "", err
 	}
 

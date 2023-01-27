@@ -13,9 +13,11 @@ import (
 	smtpmock "github.com/mocktools/go-smtp-mock/v2"
 )
 
-func TestFailedServerConnection(t *testing.T) {
+var payload = []byte(`{"channel":"test.app","feedback": {"title": "feedback","rate": {"type" : "numbers","value" : 10},"questions": [{"question": "What's great (if anything)?","answer": "I like speed."}]}}`)
 
-	payload := []byte(`{"feedback": {"questions": [{"question": "What's great (if anything)?","answer": "I like speed."}]}}`)
+var payloadDynamic = (`{"channel":"test.app","feedback": {"title": "feedback","rate": {"type" : "numbers","value" : 10},"questions": [{"question": "%d","answer": "%d"}]}}`)
+
+func TestFailedServerConnection(t *testing.T) {
 
 	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
@@ -47,14 +49,14 @@ func TestFailedServerConnection(t *testing.T) {
 
 func TestTooLargeDataSent(t *testing.T) {
 
-	payload := make([]byte, 40000)
+	payloadLarge := make([]byte, 40000)
 
-	_, err := rand.Read(payload)
+	_, err := rand.Read(payloadLarge)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payloadLarge))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	if err != nil {
@@ -82,13 +84,13 @@ func TestTooLargeDataSent(t *testing.T) {
 }
 
 func TestNonJsonRejection(t *testing.T) {
-	payload := make([]byte, 1024)
-	_, err := rand.Read(payload)
+	payloadNonJson := make([]byte, 1024)
+	_, err := rand.Read(payloadNonJson)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payloadNonJson))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	if err != nil {
@@ -149,9 +151,9 @@ func TestSeveralFeedbacksSending(t *testing.T) {
 	// send 3 messages
 	for i := range [3]int{} {
 
-		payload := fmt.Sprintf(`{"feedback": {"questions": [{"question": "%d","answer": "%d"}]}}`, i, i)
+		_payload := fmt.Sprintf(payloadDynamic, i, i)
 
-		req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer([]byte(payload)))
+		req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer([]byte(_payload)))
 		req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 		if err != nil {
@@ -179,13 +181,13 @@ func TestSeveralFeedbacksSending(t *testing.T) {
 }
 
 func TestWrongUrlRequest(t *testing.T) {
-	payload := make([]byte, 1024)
-	_, err := rand.Read(payload)
+	payloadRandom := make([]byte, 1024)
+	_, err := rand.Read(payloadRandom)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	req, err := http.NewRequest("POST", "/", bytes.NewBuffer(payload))
+	req, err := http.NewRequest("POST", "/", bytes.NewBuffer(payloadRandom))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 	if err != nil {
@@ -230,8 +232,6 @@ func TestSimpleSendEmail(t *testing.T) {
 	// Server's port will be assigned dynamically after server.Start()
 	// for case when portNumber wasn't specified
 	hostAddress, portNumber := "127.0.0.1", server.PortNumber()
-
-	payload := []byte(`{"feedback": {"questions": [{"question": "What's great (if anything)?","answer": "I like speed."}]}}`)
 
 	req, err := http.NewRequest("POST", "/v1/feedback", bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
