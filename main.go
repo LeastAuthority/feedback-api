@@ -85,15 +85,16 @@ func (c *Config) sendEmail(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	toAddressPtr := flag.String("to", "feedback@localhost", "email address to which feedback is to be sent")
-	smtpRelayHost := flag.String("smtp-server", "localhost", "smtp server that routes the email")
-	smtpRelayPort := flag.Uint("smtp-port", 1025, "smtp server port number")
-	httpPort := flag.Uint("http-port", 8001, "HTTP server port number")
+	toAddressPtr   := flag.String("to", "feedback@localhost", "email address to which feedback is to be sent")
+	fromAddressPtr := flag.String("from", "no-reply@localhost", "email address from which feedback is sent")
+	smtpRelayHost  := flag.String("smtp-server", "localhost", "smtp server that routes the email")
+	smtpRelayPort  := flag.Uint("smtp-port", 1025, "smtp server port number")
+	httpPort       := flag.Uint("http-port", 8001, "HTTP server port number")
 	flag.Parse()
 
 	c := Config{
 		to:       *toAddressPtr,
-		from:     "no-reply@localhost",
+		from:     *fromAddressPtr,
 		subject:  "Feedback",
 		smtpPort: *smtpRelayPort,
 		smtpHost: *smtpRelayHost,
@@ -103,10 +104,18 @@ func main() {
 	// email address validation
 	_, err := mail.ParseAddress(*toAddressPtr)
 	if err != nil {
-		log.Println("Invalid email address")
+		log.Println("Invalid destination email address")
 		panic(err)
 	}
-	log.Printf("Feedback email will be sent to: %s\n", *toAddressPtr)
+
+	// validate the from address as well
+	_, err = mail.ParseAddress(*fromAddressPtr)
+	if err != nil {
+		log.Println("Invalid originating email address")
+		panic(err)
+	}
+
+	log.Printf("Feedback email will be sent from: %s to: %s\n", *fromAddressPtr, *toAddressPtr)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
