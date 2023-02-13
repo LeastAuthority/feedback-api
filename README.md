@@ -64,7 +64,8 @@ SMTP_PORT=1025
 SMTP_USERNAME=xxx
 SMTP_PASSWORD=xxx
 SMTP_USE_TLS=false
-TO_MAILBOX=no-reply@localhost
+SMTP_FROM=no-reply@localhost
+TO_MAILBOX=feedback@localhost
 HTTP_PORT=8001
 ```
 
