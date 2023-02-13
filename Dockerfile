@@ -36,13 +36,15 @@ WORKDIR /app
 # Default smtp config
 ENV SMTP_SERVER=localhost
 ENV SMTP_PORT=1025
-ENV TO_MAILBOX=no-reply@localhost
+ENV SMTP_FROM=no-reply@localhost
+ENV TO_MAILBOX=feedback@localhost
 ENV HTTP_PORT=8001
 
 # Start the server app by default
 CMD ./feedback-http-server \
       -smtp-server $SMTP_SERVER \
       -smtp-port $SMTP_PORT \
+      -from $SMTP_FROM \
       -to $TO_MAILBOX \
       -http-port $HTTP_PORT
 
