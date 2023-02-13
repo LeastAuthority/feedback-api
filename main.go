@@ -104,7 +104,7 @@ func main() {
 	// email address validation
 	_, err := mail.ParseAddress(*toAddressPtr)
 	if err != nil {
-		log.Println("Invalid email address")
+		log.Println("Invalid destination email address")
 		panic(err)
 	}
 	log.Printf("Feedback email will be sent to: %s\n", *toAddressPtr)
