@@ -107,7 +107,6 @@ func main() {
 		log.Println("Invalid destination email address")
 		panic(err)
 	}
-	log.Printf("Feedback email will be sent to: %s\n", *toAddressPtr)
 
 	// validate the from address as well
 	_, err = mail.ParseAddress(*fromAddressPtr)
@@ -115,6 +114,8 @@ func main() {
 		log.Println("Invalid originating email address")
 		panic(err)
 	}
+
+	log.Printf("Feedback email will be sent from: %s to: %s\n", *fromAddressPtr, *toAddressPtr)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/feedback", c.sendEmail).Methods("POST")
