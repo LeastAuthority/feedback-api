@@ -17,37 +17,76 @@ Simple HTTPS API backend service, which will get data in JSON format and send it
 
 ## Usage
 
- - Build the code
+This section describe how to directly compile and run the application assuming the [Go](https://golang.org) programming language compiler is installed.
 
- `go build`
+Alternatively the use of [Docker](#docker) Composer is described in the next section.
 
- - Set two environment variables while invoking the `feedback-api` executable, `SMTP_USERNAME` and `SMTP_PASSWORD`.
- - Start the server with the address to which emails need to be sent
+### Build
 
- `./feedback-api -from "no-reply@example.com" -to "foo@bar.org"`
+The application can be build as follows:
 
- or
+```
+go build
+```
 
- `SMTP_USERNAME="foo@foobar.in" SMTP_PASSWORD="barbazquux" ./feedback-api -from "no-reply@example.com" -to foo@barbaz.com -smtp-server smtp.abc.xyz -smtp-port 465`
+### Run
 
-If you are using `bash`, before typing in the command above, type a `SPC` character, so that the above command carrying the username and password won't get into the bash history.
-A server listens on `localhost:8001`.
+The application directly compiled with Go can be started as follows:
 
- - Issue Post request:
+```
+./feedback-api \
+-from "no-reply@example.com" \
+-to foo@barbaz.com \
+-smtp-server smtp.abc.xyz \
+-smtp-port 465 \
+-http-port 8001
+```
 
- `curl --request POST --header "Content-Type: application/json" --data '{"feedback":{"title": "Full Feedback Form","rate": {"type" : "numbers","value" : 10},"questions":[{"question":"q1","answer":"a1"},{"question":"q2","answer":"a2"}]}}' localhost:8001/v1/feedback`
+As a result, an HTTP server should be listenning on `localhost:8001` (CTRL+C to stop).
 
-### Disable TLS
+### Configure
 
-You can disable TLS by setting the environment variable `SMTP_USE_TLS` to `"false"`. This can be useful if you want to use a dummy SMTP server for local development.
+There are a few environment variables avaialble to configure the application:
 
-### Allow insecure TLS
+- SMTP_HELO: To announce a valid client hostname when the SMTP client contacts the server.
+- SMTP_USERNAME and SMTP_PASSWORD: To authenticate the SMTP client if the server supports it.
+- SMTP_USE_TLS: Set to `false` to disable TLS, which can be useful if you want to use a dummy SMTP server for local development.
+- SMTP_USE_INSECURE_TLS: Set to `true` to allow insecure TLS, which can be useful if you want to test with a self-sign certificate server in development env.
 
-You can enable insecure TLS by setting the environment variable `SMTP_USE_INSECURE_TLS` to `"true"`. This can be useful if you want to test with a self-sign certificate server in development env.
+Example:
+
+```
+SMTP_USERNAME="foo@foobar.in" \
+SMTP_PASSWORD="barbazquux" \
+SMTP_USE_INSECURE_TLS=true \
+./feedback-api \
+-from "no-reply@example.com" \
+-to foo@barbaz.com \
+-smtp-server localhost \
+```
+
+IMPORTANT: If you are using `bash`, before typing in the command above, type a `SPC` character, so that the above command carrying the username and password won't get into the bash history.
+
+
+### Test
+
+Once the application in running, a POST request can be sent:
+
+ ```
+ curl \
+--request POST \
+--header "Content-Type: application/json" \
+--data '{"feedback":{"title": "Full Feedback Form","rate": {"type" : "numbers","value" : 10},"questions":[{"question":"q1","answer":"a1"},{"question":"q2","answer":"a2"}]}}' \
+http://localhost:8001/v1/feedback
+```
+
+REM: The JSON content needs to matce the defined template!
 
 ## Docker
 
 To facilitate integration and testing, Docker Composer support is provided in this repo.
+
+This also include a dummy SMTP server for testing purpose.
 
 ### Requirements
 
@@ -56,17 +95,20 @@ To facilitate integration and testing, Docker Composer support is provided in th
 
 ### Configuration
 
-The relevant environment variables described above can be adapted a local `.env` file:
+This method relies exclusively on environment variables which means both the application paramters and the above described variables need to be defined in a local `.env` file (ignored by Git):
 
 ```
-SMTP_SERVER=smtp-server1.local
-SMTP_PORT=1025
+SMTP_FROM=no-reply@example.com
+TO_MAILBOX=foo@barbaz.com
+SMTP_SERVER=smtp.abc.xyz
+SMTP_PORT=465
+HTTP_PORT=8001
+
+SMTP_HELO=http-server1.local
 SMTP_USERNAME=xxx
 SMTP_PASSWORD=xxx
-SMTP_USE_TLS=false
-SMTP_FROM=no-reply@localhost
-TO_MAILBOX=feedback@localhost
-HTTP_PORT=8001
+SMTP_USE_TLS=true
+SMTP_USE_INSECURE_TLS=true
 ```
 
 ### Usage
