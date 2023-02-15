@@ -35,7 +35,7 @@ A server listens on `localhost:8001`.
 
  - Issue Post request:
 
- `curl --request POST --header "Content-Type: application/json" --data '{"feedback":{"questions":[{"question":"q1","answer":"a1"},{"question":"q2","answer":"a2"}]}}' localhost:8001/v1/feedback`
+ `curl --request POST --header "Content-Type: application/json" --data '{"feedback":{"title": "Full Feedback Form","rate": {"type" : "numbers","value" : 10},"questions":[{"question":"q1","answer":"a1"},{"question":"q2","answer":"a2"}]}}' localhost:8001/v1/feedback`
 
 ### Disable TLS
 
