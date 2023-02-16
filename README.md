@@ -56,13 +56,14 @@ There are a few environment variables avaialble to configure the application:
 Example:
 
 ```
+SMTP_HELO="gw.example.com" \
 SMTP_USERNAME="foo@foobar.in" \
 SMTP_PASSWORD="barbazquux" \
 SMTP_USE_INSECURE_TLS=true \
 ./feedback-api \
 -from "no-reply@example.com" \
 -to foo@barbaz.com \
--smtp-server localhost \
+-smtp-server localhost
 ```
 
 IMPORTANT: If you are using `bash`, before typing in the command above, type a `SPC` character, so that the above command carrying the username and password won't get into the bash history.
@@ -80,7 +81,7 @@ Once the application in running, a POST request can be sent:
 http://localhost:8001/v1/feedback
 ```
 
-REM: The JSON content needs to matce the defined template!
+REM: The JSON content needs to match the defined [template](./templates.go)!
 
 ## Docker
 
@@ -95,7 +96,7 @@ This also include a dummy SMTP server for testing purpose.
 
 ### Configuration
 
-This method relies exclusively on environment variables which means both the application paramters and the above described variables need to be defined in a local `.env` file (ignored by Git):
+This method relies exclusively on environment variables which means both the application parameters and the above described variables need to be defined in a local `.env` file (ignored by Git):
 
 ```
 SMTP_FROM=no-reply@example.com
@@ -110,6 +111,8 @@ SMTP_PASSWORD=barbazquux
 SMTP_USE_TLS=true
 SMTP_USE_INSECURE_TLS=true
 ```
+
+**REM**: Some variables can lead to conflict between containers (e.g.: `SMTP_SERVER`)! We may consider renaming them.
 
 ### Usage
 
@@ -128,11 +131,13 @@ docker-compose [--compatibility] up
 
 REM: Use the `--compatibility` switch (if supported) whenever resources need to be limitted (CPU and MEM).
 
-From this point, the service(s) (http and smtp) should be running and ready to be tested ( see `curl` command above).
+From this point, the service(s) (http and smtp) should be running and ready to be tested (see `curl` command above).
 
 ### Advanced Usage
 
-If needed, Docker compose can also be used to start a single service. For instance, here is how to run a standalone HTTP server w/o the SMTP service:
+If needed, Docker compose can also be used to start a single service.
+
+For instance, here is how to run a standalone HTTP server w/o the SMTP service:
 
 ```
 docker-compose [--compatibility] run \
