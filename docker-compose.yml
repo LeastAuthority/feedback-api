@@ -25,7 +25,7 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME:-xxx}
       - SMTP_PASSWORD=${SMTP_PASSWORD:-xxx}
       - SMTP_FROM=${SMTP_FROM:-no-reply@localhost}
-      - TO_MAILBOX=${TO_MAILBOX:-feedback@localhost}
+      - SMTP_TO=${SMTP_TO:-feedback@localhost}
       - SMTP_USE_TLS=${SMTP_USE_TLS:-false}
       - SMTP_USE_INSECURE_TLS=${SMTP_USE_INSECURE_TLS:-false}
       - HTTP_PORT=${HTTP_PORT:-8001}
@@ -46,14 +46,11 @@ services:
     tty: false
     hostname: smtp-server1.local
     container_name: smtp-server1.local
-    command: python3 -m aiosmtpd --nosetuid --listen ${SMTP_SERVER:-smtp-server1.local}:${SMTP_PORT:-1025}
-    # The following works too, but is deprectated (https://peps.python.org/pep-0594/#smtpd)
-    # command: python3 -m smtpd --class DebuggingServer --nosetuid ${SMTP_SERVER:-smtp-server1.local}:${SMTP_PORT:-1025}
+    command: python3 -m aiosmtpd --nosetuid --listen 0.0.0.0:${SMTP_PORT:-1025}
     ports:
       - ${SMTP_PORT:-1025}:${SMTP_PORT:-1025}
     environment:
       - PYTHONUNBUFFERED=1
-      - TO_MAILBOX=${TO_MAILBOX:-no-reply@localhost}
     deploy: # with --compatibility when needed
       resources:
         limits:

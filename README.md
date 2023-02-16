@@ -100,7 +100,7 @@ This method relies exclusively on environment variables which means both the app
 
 ```
 SMTP_FROM=no-reply@example.com
-TO_MAILBOX=foo@barbaz.com
+SMTP_TO=foo@barbaz.com
 SMTP_SERVER=smtp.abc.xyz
 SMTP_PORT=465
 HTTP_PORT=8001
@@ -111,8 +111,6 @@ SMTP_PASSWORD=barbazquux
 SMTP_USE_TLS=true
 SMTP_USE_INSECURE_TLS=true
 ```
-
-**REM**: Some variables can lead to conflict between containers (e.g.: `SMTP_SERVER`)! We may consider renaming them.
 
 ### Usage
 
