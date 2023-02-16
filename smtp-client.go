@@ -91,6 +91,15 @@ func connectAndSendEmail(hostname string, port uint, fromAddr string, toAddr str
 		return err
 	}
 
+	// Perform HELO with a specific hostname if provided
+	helo := os.Getenv("SMTP_HELO")
+	if helo != "" {
+		err = c.Hello(helo)
+		if err != nil {
+			return err
+		}
+	}
+
 	if useTls {
 		err = c.Auth(auth)
 		if err != nil {
